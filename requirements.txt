@@ -1,0 +1,11 @@
+langchain
+langchain-community
+langchain-huggingface
+langchain-google-genai
+chromadb
+sentence-transformers
+python-dotenv
+flask
+flask-cors
+langchain-openai
+pymupdf4llm
