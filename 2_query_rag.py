@@ -27,14 +27,59 @@ prompt_template = None
 GREETINGS_MAP = {
     r"^(hi|hello|hey|hola|heyy+|hii+|greetings|howdy)[\s!.]*$": "Hello! I am Botulinum Bot, your Neural RAG Studio assistant. How can I help you today with your documents or Machine Learning questions?",
     r"^(how are you|how are you\?|how\'s it going|how do you do)[\s!.]*$": "I'm doing great and ready to answer any questions about your uploaded documents or Machine Learning topics!",
-    r"^(who are you|what is your name|what are you|who created you)[\s!.]*$": "I am Botulinum Bot, a Neural RAG Studio assistant powered by OpenRouter LLMs, ChromaDB, and an Artificial Neural Network visualizer.",
     r"^(thanks|thank you|thx|thank you so much|thanks!)[\s!.]*$": "You're very welcome! Feel free to ask if you have any more questions.",
     r"^(bye|goodbye|cya|see ya)[\s!.]*$": "Goodbye! Have a fantastic day ahead!",
     r"^(what can you do|help|features|what is this)[\s!.]*$": "I can analyze and answer questions from your uploaded PDF/Markdown documents, explain Machine Learning concepts, search ChromaDB vector embeddings, and visualize neural activations!"
 }
 
+# Creator verification state map (stores active challenge per session/query pattern)
+CREATOR_CHALLENGE_STATE = {"challenged": False}
+
+# Patterns to match questions about the creator/developer
+CREATOR_PATTERNS = [
+    r"who created you", r"who made you", r"who is your creator", r"who is your developer",
+    r"who built you", r"who is your owner", r"who designed you", r"tell me about your creator",
+    r"who created this", r"who is the creator"
+]
+
+def check_creator_challenge(question):
+    cleaned = question.strip().lower()
+    
+    # 1. Check if user is asking who created the bot
+    if any(re.search(pat, cleaned) for pat in CREATOR_PATTERNS):
+        CREATOR_CHALLENGE_STATE["challenged"] = True
+        return "I was created by an AI/ML Software Engineer! To unlock detailed information about my creator, please answer this security question: **Which is his favorite cricketer?**"
+        
+    # 2. If challenged state is active, check answer
+    if CREATOR_CHALLENGE_STATE["challenged"]:
+        if "ms dhoni" in cleaned or "dhoni" in cleaned or "mahendra singh dhoni" in cleaned or "msd" in cleaned:
+            CREATOR_CHALLENGE_STATE["challenged"] = False
+            return ("Verification successful! 🏏 Here is the profile of my creator:\n\n"
+                    "**Siddharth Shetty** is a 4th-year Computer Science and Engineering student at **AMC Engineering College** (affiliated with Visvesvaraya Technological University / VTU).\n\n"
+                    "**Key Highlights & Profile**:\n"
+                    "- **Technical Focus**: Artificial Intelligence, Machine Learning, Software Engineering, RAG & LLM Application Engineering, and Embedded Systems.\n"
+                    "- **Tech Stack**: Python, Data Structures & Algorithms (DSA), XGBoost, ESP32, MPU6050, Bluetooth Low Energy (BLE), Android Development, and LLM-based apps.\n"
+                    "- **Key Projects**:\n"
+                    "  1. **IoT-Based Intelligent Physiotherapy Monitoring & Real-Time Feedback System**: Built with ESP32, MPU6050, and BLE for motion analysis and posture feedback.\n"
+                    "  2. **CarbonWise**: An intelligent carbon-footprint tracking application to calculate and optimize environmental impact.\n"
+                    "- **Activities & Achievements**: Active participant in Hackathons, Prompt Wars, Google Developer Student Club (GDSC) activities, and open-source projects while building his GitHub & LinkedIn portfolio.\n"
+                    "- **Current Focus**: Preparing for **GATE 2027** and developing strong problem-solving and practical engineering skills for placements and internships.")
+        elif "favorite cricketer" in cleaned or "cricketer" in cleaned or "who" in cleaned or "dhoni" in cleaned:
+            return "Incorrect answer! Access to creator details is locked. Please answer: **Which is his favorite cricketer?**"
+        else:
+            # If user asks an unrelated general question, reset challenge state so general RAG works
+            CREATOR_CHALLENGE_STATE["challenged"] = False
+            
+    return None
+
 def check_fast_path_greeting(question):
     cleaned = question.strip().lower()
+    
+    # Check creator verification challenge first
+    creator_response = check_creator_challenge(question)
+    if creator_response:
+        return creator_response
+
     for pattern, response in GREETINGS_MAP.items():
         if re.search(pattern, cleaned):
             return response
