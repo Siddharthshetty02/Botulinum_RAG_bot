@@ -9,3 +9,4 @@ flask
 flask-cors
 langchain-openai
 pymupdf4llm
+gunicorn

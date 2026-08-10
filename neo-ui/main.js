@@ -14,7 +14,10 @@ const neuralVisualizerCard = document.getElementById('neuralVisualizerCard');
 const neuralCanvas = document.getElementById('neuralCanvas');
 const neuralMetricText = document.getElementById('neuralMetricText');
 
-const API_URL = 'http://localhost:5000/chat';
+const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const BASE_URL = IS_LOCAL ? 'http://localhost:5000' : 'https://stale-flies-stare.loca.lt';
+const API_URL = `${BASE_URL}/chat`;
+
 
 /* ==========================================================================
    Structured Multi-Layer Artificial Neural Network (ANN) Visualizer
@@ -233,25 +236,96 @@ const visualizer = new LayeredNeuralNetwork(neuralCanvas);
    Chat Messages & API Logic
    ========================================================================== */
 
-function addMessage(text, sender, isLoading = false) {
+function formatMarkdownText(text) {
+    if (!text) return '';
+    
+    // Escape HTML characters
+    let html = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+        
+    // Convert **bold** to <b class="font-bold text-white">
+    html = html.replace(/\*\*(.*?)\*\*/g, '<b class="font-bold text-white">$1</b>');
+    html = html.replace(/__(.*?)__/g, '<b class="font-bold text-white">$1</b>');
+    
+    // Convert `code` to highlighted span
+    html = html.replace(/`([^`]+)`/g, '<code class="bg-slate-950 text-brand-lime px-1.5 py-0.5 rounded font-mono text-xs">$1</code>');
+    
+    // Preserve linebreaks
+    html = html.replace(/\n/g, '<br>');
+    return html;
+}
+
+function addMessage(text, sender, isLoading = false, logId = null) {
     const wrapper = document.createElement('div');
     wrapper.className = `flex items-start space-x-3 ${sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`;
 
     const avatar = document.createElement('div');
     if (sender === 'user') {
-        avatar.className = 'w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 flex-shrink-0';
+        avatar.className = 'w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 flex-shrink-0';
         avatar.textContent = 'YOU';
     } else {
-        avatar.className = 'w-7 h-7 rounded-lg bg-brand-lime/20 border border-brand-lime/40 flex items-center justify-center text-xs font-bold text-brand-lime flex-shrink-0';
+        avatar.className = 'w-8 h-8 rounded-lg bg-brand-lime/20 border border-brand-lime/40 flex items-center justify-center text-xs font-bold text-brand-lime flex-shrink-0';
         avatar.textContent = 'AI';
     }
 
     const bubble = document.createElement('div');
     bubble.className = sender === 'user'
-        ? 'bg-brand-lime text-slate-950 font-medium rounded-2xl rounded-tr-none p-3.5 max-w-[85%] text-xs leading-relaxed shadow-md'
-        : `bg-slate-800/90 border border-slate-700/70 rounded-2xl rounded-tl-none p-4 max-w-[85%] text-xs text-slate-200 leading-relaxed shadow-lg ${isLoading ? 'animate-pulse text-slate-400 italic' : ''}`;
+        ? 'bg-brand-lime text-slate-950 font-medium rounded-2xl rounded-tr-none p-4 max-w-[85%] text-sm sm:text-base leading-relaxed shadow-md'
+        : `bg-slate-800/90 border border-slate-700/70 rounded-2xl rounded-tl-none p-4 max-w-[85%] text-sm sm:text-base text-slate-200 leading-relaxed shadow-lg ${isLoading ? 'animate-pulse text-slate-400 italic' : ''}`;
 
-    bubble.textContent = text;
+    const textSpan = document.createElement('div');
+    textSpan.className = 'markdown-content space-y-1';
+    textSpan.innerHTML = formatMarkdownText(text);
+    bubble.appendChild(textSpan);
+
+    // Add Feedback Rating buttons if it's a completed AI response with a logId
+    if (sender === 'ai' && !isLoading && logId) {
+        const feedbackContainer = document.createElement('div');
+        feedbackContainer.className = 'flex items-center space-x-2 mt-3 pt-2.5 border-t border-slate-700/50 text-xs text-slate-400';
+
+        const label = document.createElement('span');
+        label.textContent = 'Rate answer:';
+
+        const upBtn = document.createElement('button');
+        upBtn.className = 'hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded bg-slate-900 border border-slate-700 transition cursor-pointer';
+        upBtn.textContent = '👍';
+
+        const downBtn = document.createElement('button');
+        downBtn.className = 'hover:bg-slate-700 text-slate-300 font-bold px-2 py-1 rounded bg-slate-900 border border-slate-700 transition cursor-pointer';
+        downBtn.textContent = '👎';
+
+        const statusSpan = document.createElement('span');
+        statusSpan.className = 'text-brand-lime font-medium ml-1 hidden';
+
+        async function sendFeedback(rating) {
+            upBtn.disabled = true;
+            downBtn.disabled = true;
+            try {
+                const res = await fetch(`${BASE_URL}/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ log_id: logId, rating })
+                });
+                if (res.ok) {
+                    statusSpan.textContent = rating === 'up' ? 'Thanks! (👍 saved)' : 'Feedback logged (👎 saved)';
+                    statusSpan.classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error('Feedback error:', err);
+            }
+        }
+
+        upBtn.addEventListener('click', () => sendFeedback('up'));
+        downBtn.addEventListener('click', () => sendFeedback('down'));
+
+        feedbackContainer.appendChild(label);
+        feedbackContainer.appendChild(upBtn);
+        feedbackContainer.appendChild(downBtn);
+        feedbackContainer.appendChild(statusSpan);
+        bubble.appendChild(feedbackContainer);
+    }
 
     wrapper.appendChild(avatar);
     wrapper.appendChild(bubble);
@@ -259,6 +333,29 @@ function addMessage(text, sender, isLoading = false) {
 
     chatContainer.scrollTop = chatContainer.scrollHeight;
     return wrapper;
+}
+
+const toggleVisualizerBtn = document.getElementById('toggleVisualizerBtn');
+const closeVisualizerBtn = document.getElementById('closeVisualizerBtn');
+
+if (toggleVisualizerBtn) {
+    toggleVisualizerBtn.addEventListener('click', () => {
+        const isHidden = neuralVisualizerCard.classList.contains('hidden');
+        if (isHidden) {
+            neuralVisualizerCard.classList.remove('hidden');
+            visualizer.start();
+        } else {
+            visualizer.stop();
+            neuralVisualizerCard.classList.add('hidden');
+        }
+    });
+}
+
+if (closeVisualizerBtn) {
+    closeVisualizerBtn.addEventListener('click', () => {
+        visualizer.stop();
+        neuralVisualizerCard.classList.add('hidden');
+    });
 }
 
 chatForm.addEventListener('submit', async (e) => {
@@ -270,11 +367,9 @@ chatForm.addEventListener('submit', async (e) => {
     addMessage(question, 'user');
     userInput.value = '';
 
-    // Show Neural Visualizer Canvas & loading message
-    neuralVisualizerCard.classList.remove('hidden');
-    visualizer.start();
-
-    const loadingMsg = addMessage('Propagating through Artificial Neural Network & querying ChromaDB...', 'ai', true);
+    const loadingMsgText = 'Thinking...';
+    const loadingMsg = addMessage(loadingMsgText, 'ai', true);
+    
     sendBtn.disabled = true;
     sendBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
@@ -289,7 +384,7 @@ chatForm.addEventListener('submit', async (e) => {
         chatContainer.removeChild(loadingMsg);
 
         if (response.ok) {
-            addMessage(data.answer, 'ai');
+            addMessage(data.answer, 'ai', false, data.log_id);
         } else {
             addMessage(`Error: ${data.answer || data.error || 'Something went wrong.'}`, 'ai');
         }
@@ -300,10 +395,6 @@ chatForm.addEventListener('submit', async (e) => {
         addMessage(`Connection error: Make sure app.py is running on port 5000.`, 'ai');
         console.error('Error fetching chat:', error);
     } finally {
-        // Hide Neural Canvas Visualizer
-        visualizer.stop();
-        neuralVisualizerCard.classList.add('hidden');
-
         sendBtn.disabled = false;
         sendBtn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
@@ -332,7 +423,7 @@ pdfUpload.addEventListener('change', async (e) => {
     uploadBtn.style.opacity = '0.5';
 
     try {
-        const response = await fetch('http://localhost:5000/upload', {
+        const response = await fetch(`${BASE_URL}/upload`, {
             method: 'POST',
             body: formData
         });
@@ -375,7 +466,7 @@ pdfUpload.addEventListener('change', async (e) => {
 
 async function loadSources() {
     try {
-        const response = await fetch('http://localhost:5000/sources');
+        const response = await fetch(`${BASE_URL}/sources`);
         const data = await response.json();
 
         sourcesList.innerHTML = '';
@@ -423,7 +514,7 @@ async function deleteSource(sourceName) {
     const loadingMsg = addMessage(`Removing files for "${sourceName}" from disk and purging vector embeddings...`, 'ai', true);
 
     try {
-        const response = await fetch('http://localhost:5000/delete', {
+        const response = await fetch(`${BASE_URL}/delete`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ filename: sourceName })

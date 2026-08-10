@@ -1,0 +1,7 @@
+[
+  {
+    "prompt": "What is neural network backpropagation?",
+    "chosen": "Backpropagation computes gradients using the chain rule to update neural weights.",
+    "rejected": "Backpropagation is a general optimization algorithm."
+  }
+]

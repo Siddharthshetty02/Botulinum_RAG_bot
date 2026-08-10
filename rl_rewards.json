@@ -1,0 +1,13 @@
+{
+  "chunk_rewards": {
+    "what": 0.4961,
+    "neural": -0.0925,
+    "network": -0.0925,
+    "backpropagation?": -0.0925,
+    "home": 0.488,
+    "town": 0.488
+  },
+  "total_feedback_processed": 5,
+  "last_updated": "2026-08-10T22:29:27.295894",
+  "dpo_pair_count": 1
+}
