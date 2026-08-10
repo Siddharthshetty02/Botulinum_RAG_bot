@@ -64,11 +64,9 @@ def check_creator_challenge(question):
                     "  2. **CarbonWise**: An intelligent carbon-footprint tracking application to calculate and optimize environmental impact.\n"
                     "- **Activities & Achievements**: Active participant in Hackathons, Prompt Wars, Google Developer Student Club (GDSC) activities, and open-source projects while building his GitHub & LinkedIn portfolio.\n"
                     "- **Current Focus**: Preparing for **GATE 2027** and developing strong problem-solving and practical engineering skills for placements and internships.")
-        elif "favorite cricketer" in cleaned or "cricketer" in cleaned or "who" in cleaned or "dhoni" in cleaned:
-            return "Incorrect answer! Access to creator details is locked. Please answer: **Which is his favorite cricketer?**"
         else:
-            # If user asks an unrelated general question, reset challenge state so general RAG works
             CREATOR_CHALLENGE_STATE["challenged"] = False
+            return "Nope!"
             
     return None
 
