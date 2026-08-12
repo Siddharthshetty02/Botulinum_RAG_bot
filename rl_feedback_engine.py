@@ -23,14 +23,29 @@ def load_jsonl(filepath):
             print(f"Error reading {filepath}: {e}")
     return data
 
+DEFAULT_ML_REWARDS = {
+    "machine": 0.85, "learning": 0.85, "xgboost": 0.90, "hyperparameter": 0.85,
+    "classification": 0.80, "regression": 0.80, "clustering": 0.80,
+    "overfitting": 0.85, "bias": 0.85, "variance": 0.85, "validation": 0.75,
+    "precision": 0.80, "recall": 0.80, "f1": 0.80, "chromadb": 0.75, "vector": 0.75,
+    "regularization": 0.80, "supervised": 0.80, "unsupervised": 0.80
+}
+
 def load_rl_rewards():
     if os.path.exists(RL_REWARDS_FILE):
         try:
             with open(RL_REWARDS_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
+                data = json.load(f)
+                # Ensure default ML rewards are merged if not already present
+                rewards = data.get("chunk_rewards", {})
+                for k, v in DEFAULT_ML_REWARDS.items():
+                    if k not in rewards:
+                        rewards[k] = v
+                data["chunk_rewards"] = rewards
+                return data
         except Exception as e:
             print(f"Error reading {RL_REWARDS_FILE}: {e}")
-    return {"chunk_rewards": {}, "total_feedback_processed": 0, "last_updated": None}
+    return {"chunk_rewards": DEFAULT_ML_REWARDS.copy(), "total_feedback_processed": 0, "last_updated": None}
 
 def save_rl_rewards(rewards_data):
     try:

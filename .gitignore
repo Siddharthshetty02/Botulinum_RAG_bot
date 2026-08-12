@@ -17,3 +17,5 @@ Thumbs.db
 .vscode/
 .idea/
 *.log
+chat_logs.jsonl
+feedback_logs.jsonl

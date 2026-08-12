@@ -43,55 +43,17 @@
         </div>
         <div>
           <h1 class="text-xl font-bold text-white tracking-tight">Botulinum <span class="text-brand-lime">Bot</span></h1>
-          <p class="text-[11px] text-slate-400 font-mono">Neural RAG Knowledge Assistant</p>
+          <p class="text-[11px] text-slate-400 font-mono">Machine Learning RAG Knowledge Assistant</p>
         </div>
       </div>
 
       <div class="flex items-center space-x-3">
-        <button id="toggleVisualizerBtn" class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-500/20 transition cursor-pointer">
-          <span>🧠 View ANN Visualizer</span>
-        </button>
         <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-mono font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
           <span class="w-2 h-2 rounded-full bg-emerald-400 mr-2 animate-pulse"></span>
-          System Active
+          ML Engine Active
         </span>
       </div>
     </header>
-
-    <!-- Neural Retrieval Pop-up Modal (Manual toggle only, no auto pop-up) -->
-    <div id="neuralVisualizerCard" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300">
-      <div class="w-full max-w-2xl bg-slate-900/95 border border-cyan-500/50 rounded-2xl p-6 relative overflow-hidden shadow-[0_0_60px_rgba(56,189,248,0.35)] flex flex-col gap-4">
-        
-        <!-- Header status bar -->
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div class="flex items-center space-x-3">
-            <span class="relative flex h-3 w-3">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-400"></span>
-            </span>
-            <div>
-              <h3 class="text-sm font-mono font-bold text-cyan-400 tracking-wide uppercase">Artificial Neural Network Visualizer</h3>
-              <p class="text-[11px] text-slate-400 font-mono">5-Layer Neural Propagation Canvas</p>
-            </div>
-          </div>
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-mono font-semibold text-cyan-300 bg-cyan-950/80 border border-cyan-500/30 px-3 py-1 rounded-lg" id="neuralMetricText">Dim(384) Embeddings</span>
-            <button id="closeVisualizerBtn" class="text-slate-400 hover:text-white text-base px-2 py-0.5 rounded hover:bg-slate-800 transition">✕</button>
-          </div>
-        </div>
-
-        <!-- Artificial Neural Network Canvas -->
-        <canvas id="neuralCanvas" class="w-full h-64 rounded-xl bg-slate-950 border border-slate-800/90 shadow-inner"></canvas>
-
-        <div class="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-1">
-          <span class="flex items-center space-x-1.5">
-            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-            <span class="text-slate-300 font-semibold">Forward Propagation Active</span>
-          </span>
-          <span class="text-slate-500 italic">Pop-up window automatically closes upon completion</span>
-        </div>
-      </div>
-    </div>
 
     <!-- Main Container -->
     <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex-grow flex flex-col gap-6">
