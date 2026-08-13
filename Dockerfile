@@ -16,6 +16,7 @@ COPY . .
 # Build knowledge base vector store into ChromaDB
 RUN python index_kb.py
 
-EXPOSE 5000
+ENV PORT=10000
+EXPOSE 10000
 
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000", "--timeout", "120"]
+CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT:-10000} --timeout 120"]
