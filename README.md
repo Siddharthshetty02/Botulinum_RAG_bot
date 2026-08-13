@@ -1,3 +1,12 @@
+---
+title: Botulinum Rag Backend
+emoji: 🧪
+colorFrom: indigo
+colorTo: blue
+sdk: docker
+app_port: 7860
+---
+
 # ⚡ Botulinum Bot - Machine Learning RAG Studio
 
 **Botulinum Bot** is a high-performance Retrieval-Augmented Generation (RAG) studio fine-tuned for **Machine Learning (ML)** engineering. Powered by **OpenRouter's free open-weight LLMs** (`openai/gpt-oss-20b:free`), local **ChromaDB** vector storage, **RL feedback keyword re-ranking**, **DPO preference dataset generation**, and strict **Safety Guardrails**.
