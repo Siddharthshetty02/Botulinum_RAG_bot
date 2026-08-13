@@ -11,7 +11,7 @@ const sourcesList = document.getElementById('sourcesList');
 const refreshSourcesBtn = document.getElementById('refreshSourcesBtn');
 
 const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-const BASE_URL = IS_LOCAL ? 'http://localhost:5000' : 'https://web-production-c48d4.up.railway.app';
+const BASE_URL = IS_LOCAL ? 'http://localhost:5000' : 'https://botulinum-rag-bot-1.onrender.com';
 const API_URL = `${BASE_URL}/chat`;
 
 /* ==========================================================================
