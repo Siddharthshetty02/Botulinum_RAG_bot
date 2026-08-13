@@ -24,6 +24,11 @@ spec_upload.loader.exec_module(process_upload)
 app = Flask(__name__)
 CORS(app) # Allow cross-origin requests from frontend UI
 
+@app.route('/', methods=['GET'])
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({"status": "ok", "message": "Botulinum RAG Studio Backend is running!"})
+
 LOGS_FILE = "chat_logs.jsonl"
 FEEDBACK_FILE = "feedback_logs.jsonl"
 
