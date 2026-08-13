@@ -1,9 +1,8 @@
 langchain
 langchain-community
-langchain-huggingface
+fastembed
 langchain-google-genai
 chromadb
-sentence-transformers
 python-dotenv
 flask
 flask-cors

@@ -2,7 +2,7 @@ import os
 import re
 import sys
 from dotenv import load_dotenv
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import PromptTemplate
@@ -140,8 +140,8 @@ def initialize_rag_models():
     global embeddings, vector_store, llm, prompt_template
     print("Initializing RAG Pipeline models globally (this might take a few seconds)...")
     try:
-        # We need to use the exact same embedding model that we used to build the store
-        embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        # Use lightweight ONNX FastEmbed model (<50MB RAM)
+        embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
         
         # Load the existing database from disk
         vector_store = Chroma(

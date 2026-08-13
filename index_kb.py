@@ -1,7 +1,7 @@
 import os
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import MarkdownTextSplitter, RecursiveCharacterTextSplitter
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_community.embeddings import FastEmbedEmbeddings
 from langchain_community.vectorstores import Chroma
 
 def index_all_documents():
@@ -31,8 +31,8 @@ def index_all_documents():
         except Exception as e:
             print(f"   - Error reading {filename}: {e}")
 
-    print(f"\n2. Initializing Embedding Model ('all-MiniLM-L6-v2')...")
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    print(f"\n2. Initializing Lightweight Embedding Model ('BAAI/bge-small-en-v1.5')...")
+    embeddings = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
 
     print("\n3. Indexing chunks into Chroma vector store ('./chroma_db')...")
     vector_store = Chroma.from_documents(
