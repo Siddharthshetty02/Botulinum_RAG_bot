@@ -18,5 +18,6 @@ RUN python index_kb.py
 
 EXPOSE 5000
 EXPOSE 10000
+EXPOSE 7860
 
-CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT:-10000} --bind 0.0.0.0:5000 --timeout 120"]
+CMD ["sh", "-c", "gunicorn app:app --bind 0.0.0.0:${PORT:-7860} --bind 0.0.0.0:5000 --timeout 120"]
