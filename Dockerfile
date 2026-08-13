@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Build knowledge base vector store into ChromaDB
+RUN python index_kb.py
+
 EXPOSE 5000
 
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:5000", "--timeout", "120"]
